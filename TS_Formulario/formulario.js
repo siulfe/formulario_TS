@@ -375,7 +375,6 @@ try{
 			    	},
 			    	error: function(resp){
 			    		sendPetitionCalculator = false
-			    		console.log(resp)
 			    		toastr.info("No se ha podido registrar su solicitud.");
 			    	}
 
@@ -387,7 +386,6 @@ try{
     		try{
 	    		sendPetitionCalculator = false
 	    		if(resp.error != null){
-			    	console.log(resp)
 	    			toastr.info("No se ha podido obtener el listado de productos, intente nuevamente.")
 	    			return
 	    		}
@@ -418,10 +416,10 @@ try{
 
 	    		dataProducts = resp;
     		}catch(e){
-    			console.error("Error: a ocurrido un error inesperado al llenar la tabla")
+    			console.error("Error: a ocurrido un error inesperado al llenar la tabla. "+e)
     		}	
     	}
 
 	}catch(e){
-		console.log("calculator: "+e)
+		console.error("calculator: "+e)
 	}
