@@ -319,7 +319,7 @@
 						</div>
 					</form>
 
-					<div id="div_table_calculator" style="display:none">
+					<div id="div_table_calculator">
 						<div class="row mt-1">
 							<div class="col-md-12 col-lg-12 col-sm-12">
 								<p class="text-right" id="text_results"></p>
@@ -339,7 +339,13 @@
 										</tr>
 									</thead>
 									<tbody id="body_table_products">
-										
+										<tr>
+										<td>CT-010</td>
+										<td>Escalerilla PTM</td>
+										<td class="text-center">25</td>
+										<td class="text-center">50 m</td>
+										<td class="text-center"><img src="" class="table-img" alt="sin foto"></td>
+									</tr>
 									</tbody>
 								</table>
 							</div>
@@ -414,165 +420,7 @@
 					$(".modal-backdrop").hide()
 				})
 			}
-
-			$("#form_products").on('submit', function(evt){
-			    evt.preventDefault();  
-
-			    if(sendPetitionCalculator){
-			    	return
-			    }
-
-			    var data = {}
-
-			    data.type_instalation = $('input:radio[name=type_instalation]:checked').val()
-
-			    data.ladder = $('input:radio[name=ladder]:checked').val()
-
-			    data.distance = $('#distance').val()
-
-			    data.curves = $('#curves').val()
-
-			    data.cascade = $('#cascade').val()
-
-			    data.optionals = []
-
-
-			    var aux = $('#optionals1').val()
-
-			    if(aux != ""){
-			   		data.optionals.push({id:7, count:aux});
-			    }
-
-
-			    aux = $('#optionals2').val()
-
-			    if(aux != ""){
-			   		data.optionals.push({id:8, count:aux});
-			    }
-
-
-			    aux = $('#optionals3').val()
-
-			    if(aux != ""){
-			   		data.optionals.push({id:9, count:aux});
-			    }
-
-
-			    aux = $('#optionals4').val()
-
-			    if(aux != ""){
-			   		data.optionals.push({id:10, count:aux});
-			    }
-
-			    data.token = 'bc3b2003-dab0-4d91-86c6-b0f70eb16781';
-
-				sendPetitionCalculator = true
-			    $.ajax({ 
-			    	url: 'http://127.0.0.1:8000/api/products', 
-			    	type:'POST', 
-			    	dataType:'json',
-			    	data:data,
-			    	success: fillTable,
-			    	error: function(resp){
-			    		sendPetitionCalculator = false
-			    		toastr.info("No se ha podido obtener el listado de productos");
-			    	}
-
-				})
-
-			 });
-
-
-			$("#form_budget").on('submit', function(evt){
-				evt.preventDefault();
-
-				if(sendPetitionCalculator){
-					return
-				}
-
-				user = {}
-
-				user.name = $("#name_budget").val()
-				user.email = $("#email_budget").val()
-				user.phone = $("#phone_budget").val()
-
-				dataProducts.user = user
-			    dataProducts.token = 'bc3b2003-dab0-4d91-86c6-b0f70eb16781';
-				sendPetitionCalculator = true
-				toastr.info("Enviando el registro, espere un momento por favor.")
-				
-				$.ajax({ 
-			    	url: 'http://127.0.0.1:8000/api/products/pdf', 
-			    	type:'POST', 
-			    	dataType:'json',
-			    	data:dataProducts,
-			    	success: function(resp){
-			    		console.log(resp)
-			    		if(resp.error != null){
-				    		sendPetitionCalculator = false
-			    			toastr.info("No se ha podido registrar su solicitud, intente nuevamente.")
-			    			return
-			    		}
-
-			    		if(resp.result){
-			    			toastr.success("Su petición a sido registrada con exito")
-
-			    			$("#form_products")[0].reset()
-			    			$("#form_budget")[0].reset()
-	    					$("#div_table_calculator").css("display","none")
-							$("#modal_budget").modal('hide');
-				    		sendPetitionCalculator = false
-			    			return
-			    		}
-
-				    	toastr.info("Se ha detectado problemas para obtener la respuesta del servidor")
-			    	},
-			    	error: function(resp){
-			    		sendPetitionCalculator = false
-			    		toastr.info("No se ha podido registrar su solicitud.");
-			    	}
-
-				})
-			})
 		})
-
-		function fillTable(resp){
-    		try{
-	    		sendPetitionCalculator = false
-	    		if(resp.error != null){
-	    			toastr.info("No se ha podido obtener el listado de productos, intente nuevamente.")
-	    			return
-	    		}
-
-	    		$("#text_results").html("Resultado "+resp.count_total+" items")
-
-	    		$("#body_table_products").html("")
-
-	    		$("#div_table_calculator").css("display","")
-
-	    		resp.products.map(data=>{
-	    			var long = ""
-
-	    			if(typeof data.long_total !== 'undefined' && data.long_total != null){
-	    				long = data.long_total+" "
-	    			}
-
-	    			var html = `<tr>
-	    				<td>`+data.code+`</td>
-						<td>`+data.description+`</td>
-						<td class="text-center">`+data.count_total+`</td>
-						<td class="text-center">`+long+``+data.unit+`</td>
-						<td class="text-center"><img src="`+data.photo+`" class="table-img" alt="sin foto"></td>
-	    			</tr>`
-
-	    			$("#body_table_products").append(html)
-	    		})
-
-	    		dataProducts = resp;
-    		}catch(e){
-    			console.error("Error: a ocurrido un error inesperado al llenar la tabla")
-    		}	
-    	}
 
 	}catch(e){
 		console.log("calculator: "+e)
