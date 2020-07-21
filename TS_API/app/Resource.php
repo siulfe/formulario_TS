@@ -10,19 +10,19 @@ class Resource extends Model
 	public static function imgPath($param){
 
 		if($param == null){
-			return storage_path()."/app/public/img/";
+			return public_path()."/storage/img/";
 		}
 
-		return storage_path()."/app/public/img/".$param;
+		return public_path()."/storage/img/".$param;
 	}
 
 	public static function filesPath($param){
 
 		if($param == null){
-			return storage_path()."/app/public/files/";
+			return public_path()."/storage/files/";
 		}
 
-		return storage_path()."/app/public/files/".$param;
+		return public_path()."/storage/files/".$param;
 	}
 
 
