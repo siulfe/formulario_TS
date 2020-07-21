@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Resource;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -34,7 +35,7 @@ class sendinformation extends Mailable
         return $this->view('mails.emailProducts')
                     ->text('mails.emailProducts_plain')
                     ->subject('Calculos de Proyecto de Bandejas Portables')
-                    ->attach(public_path()."/storage/files/products.pdf", [
+                    ->attach(Resource::filesPath("products.pdf"), [
                               'as' => 'productos.pdf',
                               'mime' => 'text/pdf',
                       ]);

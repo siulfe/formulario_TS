@@ -7,6 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 class Resource extends Model
 {
 
+	public static function imgPath($param){
+
+		if($param == null){
+			return storage_path()."/app/public/img/";
+		}
+
+		return storage_path()."/app/public/img/".$param;
+	}
+
+	public static function filesPath($param){
+
+		if($param == null){
+			return storage_path()."/app/public/files/";
+		}
+
+		return storage_path()."/app/public/files/".$param;
+	}
+
+
 	public static function CalculateMts(&$product,$distance,&$array){
         $product->count_total = ceil($distance/$product->long);
         $product->long_total = $product->count_total * $product->long;

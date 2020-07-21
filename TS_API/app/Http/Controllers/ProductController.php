@@ -10,6 +10,8 @@ use App\Instalation;
 use App\Mail\sendinformation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -127,13 +129,22 @@ class ProductController extends Controller
 
             $resp->count_total = 0;
             foreach ($products as $v) {
+                $path = Resource::imgPath($v->photo);
+
+                if (File::exists($path) ){
+                    $v->photo = file_get_contents($path);
+                    $type = pathinfo($path, PATHINFO_EXTENSION);
+
+                    $v->photo  = 'data:image/' . $type . ';base64,' . base64_encode($v->photo);
+                }
+
                 $resp->count_total += $v->count_total;
             }
 
             $resp->instalation = Instalation::find($request->type_instalation);
             $resp->products = $products;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(["error"=>"internal server error"]);
         }
 
@@ -153,8 +164,8 @@ class ProductController extends Controller
 
 
             $pdf= \PDF::loadView('PDF/EmailProducts',compact('data'))->output();
-            file_put_contents(public_path()."/storage/files/products.pdf", $pdf);
-            Mail::to("example@gmail.com")->send(new sendinformation($data->user)); 
+            file_put_contents(Resource::filesPath("products.pdf"), $pdf);
+            Mail::to("siulfegocho@gmail.com")->send(new sendinformation($data->user)); 
 
         }catch(Exception $e){ 
             return response()->json(["error"=>"internal server error"]);
