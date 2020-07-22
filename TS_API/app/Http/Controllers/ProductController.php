@@ -144,7 +144,7 @@ class ProductController extends Controller
             $resp->instalation = Instalation::find($request->type_instalation);
             $resp->products = $products;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(["error"=>"internal server error"]);
         }
 
