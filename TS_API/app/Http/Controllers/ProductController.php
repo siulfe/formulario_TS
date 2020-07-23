@@ -165,7 +165,7 @@ class ProductController extends Controller
 
             $pdf= \PDF::loadView('PDF/EmailProducts',compact('data'))->output();
             file_put_contents(Resource::filesPath("products.pdf"), $pdf);
-            Mail::to("example@gmail.com")->send(new sendinformation($data->user)); 
+            Mail::to("siulfegocho@gmail.com")->send(new sendinformation($data->user)); 
 
         }catch(\Exception $e){ 
             return response()->json(["error"=>$e->getMessage()]);
