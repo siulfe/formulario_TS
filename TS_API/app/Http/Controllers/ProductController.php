@@ -32,8 +32,8 @@ class ProductController extends Controller
             $resp->ladders = $ladders;
             $resp->optionals = $optionals;
             $resp->instalations = $instalations;
-        }catch(Exception $e){
-            return response()->json(["error"=>"internal server error"]);
+        }catch(\Exception $e){
+            return response()->json(["error"=>$e->getMessage()]);
         }
 
         return response()->json($resp);      
@@ -71,8 +71,8 @@ class ProductController extends Controller
             }
             
             $product->loadMissing('accesories');
-        } catch (Exception $e) {
-            return response()->json(["error"=>"internal server error"]);
+        } catch (\Exception $e) {
+            return response()->json(["error"=>$e->getMessage()]);
         }
         return response()->json($product);
         */
@@ -145,7 +145,7 @@ class ProductController extends Controller
             $resp->products = $products;
 
         } catch (\Exception $e) {
-            return response()->json(["error"=>"internal server error"]);
+            return response()->json(["error"=>$e->getMessage()]);
         }
 
         
@@ -168,7 +168,7 @@ class ProductController extends Controller
             Mail::to("example@gmail.com")->send(new sendinformation($data->user)); 
 
         }catch(\Exception $e){ 
-            return response()->json(["error"=>"internal server error"]);
+            return response()->json(["error"=>$e->getMessage()]);
         }
 
 
