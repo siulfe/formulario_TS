@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 */
 
 
-Route::middleware(['cors','private_token'])->group(function()
+Route::middleware(['cors'])->group(function()
 {
 	Route::resource('products','ProductController');
 	Route::post('products/pdf','ProductController@sendpdf')->name("pdf");

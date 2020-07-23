@@ -144,13 +144,8 @@ class ProductController extends Controller
             $resp->instalation = Instalation::find($request->type_instalation);
             $resp->products = $products;
 
-<<<<<<< HEAD
         } catch (\Exception $e) {
             return response()->json(["error"=>$e->getMessage()]);
-=======
-        } catch (Exception $e) {
-            return response()->json(["error"=>"internal server error"]);
->>>>>>> 6add515c5d4638ef09c175ea22b17f04b307052d
         }
 
         
@@ -172,15 +167,10 @@ class ProductController extends Controller
             file_put_contents(Resource::filesPath("products.pdf"), $pdf);
             Mail::to("example@gmail.com")->send(new sendinformation($data->user)); 
 
-<<<<<<< HEAD
         }catch(\Exception $e){ 
             return response()->json(["error"=>$e->getMessage()]);
-=======
-        }catch(Exception $e){ 
-            return response()->json(["error"=>"internal server error"]);
->>>>>>> 6add515c5d4638ef09c175ea22b17f04b307052d
-        }
 
+        }
 
         return response()->json(["result"=>true]);
     }   
