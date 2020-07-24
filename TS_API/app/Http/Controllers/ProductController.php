@@ -163,7 +163,7 @@ class ProductController extends Controller
             $data->count_total = $request->count_total;
 
 
-            $pdf= \PDF::loadView('PDF/EmailProducts',compact('data'))->output();
+            $pdf= \PDF::loadView('PDF/emailProducts',compact('data'))->output();
             file_put_contents(Resource::filesPath("products.pdf"), $pdf);
             Mail::to("siulfegocho@gmail.com")->send(new sendinformation($data->user)); 
 
