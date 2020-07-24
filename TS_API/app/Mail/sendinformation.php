@@ -35,9 +35,9 @@ class sendinformation extends Mailable
         return $this->view('mails.emailProducts')
                     ->text('mails.emailProducts_plain')
                     ->subject('Calculos de Proyecto de Bandejas Portables')
-                    ->attach(Resource::filesPath("products.pdf"), [
-                              'as' => 'productos.pdf',
-                              'mime' => 'text/pdf',
-                      ]);
+                    ->attachData(\Storage::disk('public')->get(Resource::filesPath("products.pdf")), 'productos.pdf')
+                    ->with([
+                        'name' => 'Tech Solution',
+                    ]);
     }
 }

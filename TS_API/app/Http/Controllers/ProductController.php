@@ -38,7 +38,12 @@ class ProductController extends Controller
 
         return response()->json($resp);      
         */
-        return response()->json(["resp"=>true]);
+        $path = Resource::imgPath("W-011.jpg");
+        return response()->json([
+            "path" => $path,
+            "resp"=>\Storage::disk('public')->url($path),
+            "exists" => \Storage::disk('public')->exists($path)
+        ]);
     }
 
     /**
@@ -90,8 +95,8 @@ class ProductController extends Controller
         $products = array();
         
         try {
+            //return $request->ladder;
             $ladder = Product::find($request->ladder);
-
             Resource::CalculateMts($ladder,$request->distance,$products);
 
             $ladder->loadMissing('accesories');
@@ -131,8 +136,10 @@ class ProductController extends Controller
             foreach ($products as $v) {
                 $path = Resource::imgPath($v->photo);
 
-                if (File::exists($path) ){
-                    $v->photo = file_get_contents($path);
+                //File::exists($path)
+                if (\Storage::disk('public')->exists($path) ){
+                   // $v->photo = file_get_contents($path);
+                    $v->photo = \Storage::disk('public')->get($path);
                     $type = pathinfo($path, PATHINFO_EXTENSION);
 
                     $v->photo  = 'data:image/' . $type . ';base64,' . base64_encode($v->photo);
@@ -148,7 +155,6 @@ class ProductController extends Controller
             return response()->json(["error"=>$e->getMessage()]);
         }
 
-        
        return response()->json($resp);
     }
 
@@ -162,10 +168,12 @@ class ProductController extends Controller
             $data->user = $request->user;
             $data->count_total = $request->count_total;
 
-
             $pdf= \PDF::loadView('PDF/emailProducts',compact('data'))->output();
-            file_put_contents(Resource::filesPath("products.pdf"), $pdf);
-            Mail::to("siulfegocho@gmail.com")->send(new sendinformation($data->user)); 
+
+            \Storage::disk('public')->put(Resource::filesPath("products.pdf"),  $pdf);
+            //file_put_contents(Resource::filesPath("products.pdf"), $pdf);
+
+            Mail::to(config('app.send_email_to'))->send(new sendinformation($data->user)); 
 
         }catch(\Exception $e){ 
             return response()->json(["error"=>$e->getMessage()]);

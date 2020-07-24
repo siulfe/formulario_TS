@@ -2,6 +2,9 @@
 
 return [
 
+    'public_path' => env('APP_URL_PUBLIC','http://localhost/'),
+    'send_email_to' => env('SEND_EMAIL_TO','example@example.com'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

@@ -8,23 +8,28 @@ class Resource extends Model
 {
 
 	public static function imgPath($param){
-
+		$path = "/img";//config('app.public_path');
+		
 		if($param == null){
-			return public_path()."/storage/img/";
+			//return $path."/storage/img/";
+			return $path;
 		}
 
-		return public_path()."/storage/img/".$param;
+		//return $path."/storage/img/".$param;
+		return $path."/".$param;
 	}
 
 	public static function filesPath($param){
+		$path = "/files";//config('app.public_path');
 
 		if($param == null){
-			return public_path()."/storage/files/";
+			//return $path."/storage/files/";
+			return $path;
 		}
 
-		return public_path()."/storage/files/".$param;
+		//return $path."/storage/files/".$param;
+		return $path."/".$param;
 	}
-
 
 	public static function CalculateMts(&$product,$distance,&$array){
         $product->count_total = ceil($distance/$product->long);
