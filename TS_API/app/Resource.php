@@ -65,9 +65,9 @@ class Resource extends Model
 
     public static function CalculateAccesory($product,$accesory,&$array,$type_instalation){
 		$validate = true;
+		$aux = Accesory::Find($accesory->id);
 
     	if($type_instalation != null){
-    		$aux = Accesory::Find($accesory->id);
     		$aux->loadMissing('instalations');
     		$validate = false;
 
@@ -77,25 +77,60 @@ class Resource extends Model
 					break;
 				}
 			}
-
     	}
 
     	if(!$validate){
 			return;
 		}
 
-		switch ($accesory->type_relation) {
-		    case 1:
-		            $total_mts_product = $product->count_total * $product->long;
-		            $accesory->count_total = ceil($accesory->count * ($total_mts_product / $accesory->count_product));
-		        break;
-		    case 2:
-		    case 3:
-		            $accesory->count_total = $product->count_total * $accesory->count;
-        	break;
+		$aux->loadMissing('calculations');
+		foreach ($aux->calculations as $v ) {
+			Resource::CalculateTotal($v, $product, $aux);
+		}
+
+		if(is_float($aux->count_total)){
+        	$aux->count_total = ceil($aux->count_total);
         }
+
+        $accesory->count_total = $aux->count_total;
+
         if(is_array($array)){
         	$array[] =json_decode(json_encode($accesory));
         }
+    }
+
+    public static function CalculateTotal($calculate, $product, $accesory){
+    	if($calculate->product_condition_id != null && $product->id != $calculate->product_condition_id){
+    		return;
+    	}
+
+    	switch ($calculate->type_relation) {
+		    case 1:
+		            $total_mts_product = $product->count_total * $product->long;
+		           //$accesory->count_total = ceil($accesory->count * ($total_mts_product / $accesory->count_product));
+
+					$accesory->count_total = $total_mts_product / $calculate->count_product;
+
+		            if(is_float($accesory->count_total)){
+		            	$accesory->count_total = ($calculate->count * floor($accesory->count_total) ) + $calculate->count;
+		            }else{
+		            	$accesory->count_total = $calculate->count * $accesory->count_total;
+		            }
+		        	break;
+		    case 2:
+		            $accesory->count_total = ($product->count_total / $calculate->count_product) * $calculate->count;
+		            break;
+		    case 3: $accesory->count_total = ($accesory->count_total / $calculate->count_product) * $calculate->count;
+        			break;
+		    case 4:
+		    		$total_mts_product = $product->count_total * $product->long;
+		           
+					$accesory->count_total = $total_mts_product / $calculate->count_product;
+
+	            	$accesory->count_total = $calculate->count * $accesory->count_total;
+		            break;
+		    
+        }
+
     }
 }

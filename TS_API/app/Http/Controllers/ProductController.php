@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Product;
 use App\Accesory;
+use App\Calculation;
 use App\Resource;
 use App\User;
 use App\Instalation;
@@ -38,12 +39,20 @@ class ProductController extends Controller
 
         return response()->json($resp);      
         */
+
+        $resp = Accesory::find(1);
+
+        $resp->loadMissing('calculations');
+
+        return response()->json($resp);
+        /*
         $path = Resource::imgPath("W-011.jpg");
         return response()->json([
             "path" => $path,
             "resp"=>\Storage::disk('public')->url($path),
             "exists" => \Storage::disk('public')->exists($path)
-        ]);
+        ]);*/
+
     }
 
     /**
@@ -104,7 +113,7 @@ class ProductController extends Controller
             Resource::CalculateAccesoriesForProduct($ladder, $products,$request->type_instalation);
 
             if($request->curves != null){
-                $accesories = Accesory::where("type_relation", "=", 3)->get();
+                $accesories = Accesory::where("type", "=", 2)->get();
                 $p = new Product;
 
                 $p->count_total = $request->curves;
@@ -168,12 +177,29 @@ class ProductController extends Controller
             $data->user = $request->user;
             $data->count_total = $request->count_total;
 
+            
+            
+            $data->headerIMG = \Storage::disk('public')->get(Resource::imgPath('headerPDF.jpg'));
+
+            $type = pathinfo(Resource::imgPath('headerPDF.jpg'), PATHINFO_EXTENSION);
+
+            $data->headerIMG = 'data:image/' . $type . ';base64,' . base64_encode($data->headerIMG);
+
             $pdf= \PDF::loadView('PDF/emailProducts',compact('data'))->output();
 
+
             \Storage::disk('public')->put(Resource::filesPath("products.pdf"),  $pdf);
-            //file_put_contents(Resource::filesPath("products.pdf"), $pdf);
+            
 
             Mail::to(config('app.send_email_to'))->send(new sendinformation($data->user)); 
+
+            $user = new User();
+
+            $user->name = $request->user["name"];
+            $user->email = $request->user["email"];
+            $user->phone = $request->user["phone"];
+
+            $user->save();
 
         }catch(\Exception $e){ 
             return response()->json(["error"=>$e->getMessage()]);

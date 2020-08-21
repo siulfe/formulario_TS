@@ -14,6 +14,10 @@ class Accesory extends Model
 	    return $this->belongsToMany('App\Product');
 	}
 	
+    public function calculations() {
+	    return $this->hasMany('App\Calculation')->orderBy("position");
+	}
+	
     public function instalations() {
 	    return $this->belongsToMany('App\Instalation');
 	}

@@ -20,8 +20,8 @@ class CreateProductsTable extends Migration
             $table->string('unit');
             $table->text('photo');
             $table->integer('count')->nullable();
-            $table->double('width')->nullable();
-            $table->double('long')->nullable();
+            $table->double('width',12,2)->nullable();
+            $table->double('long',12,2)->nullable();
             $table->integer('type')->unsigned();
         });
     }

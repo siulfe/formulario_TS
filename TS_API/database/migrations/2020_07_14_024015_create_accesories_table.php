@@ -18,10 +18,8 @@ class CreateAccesoriesTable extends Migration
             $table->string('code');
             $table->string('description');
             $table->string('unit');
-            $table->integer('count');
-            $table->integer('type_relation')->unsigned();
-            $table->double('count_product');
             $table->text('photo');
+            $table->integer('type')->unsigned();
         });
     }
 
