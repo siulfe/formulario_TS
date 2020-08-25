@@ -40,11 +40,6 @@ class ProductController extends Controller
         return response()->json($resp);      
         */
 
-        $resp = Accesory::find(1);
-
-        $resp->loadMissing('calculations');
-
-        return response()->json($resp);
         /*
         $path = Resource::imgPath("W-011.jpg");
         return response()->json([
@@ -53,6 +48,11 @@ class ProductController extends Controller
             "exists" => \Storage::disk('public')->exists($path)
         ]);*/
 
+        $resp = Accesory::find(1);
+
+        $resp->loadMissing('calculations');
+
+        return response()->json($resp);
     }
 
     /**
@@ -104,7 +104,6 @@ class ProductController extends Controller
         $products = array();
         
         try {
-            //return $request->ladder;
             $ladder = Product::find($request->ladder);
             Resource::CalculateMts($ladder,$request->distance,$products);
 
@@ -145,9 +144,7 @@ class ProductController extends Controller
             foreach ($products as $v) {
                 $path = Resource::imgPath($v->photo);
 
-                //File::exists($path)
                 if (\Storage::disk('public')->exists($path) ){
-                   // $v->photo = file_get_contents($path);
                     $v->photo = \Storage::disk('public')->get($path);
                     $type = pathinfo($path, PATHINFO_EXTENSION);
 
@@ -155,7 +152,13 @@ class ProductController extends Controller
                 }
 
                 $resp->count_total += $v->count_total;
+                Resource::FormatNumber($v, "count_total");
+
+                if(property_exists($v,"long_total"))
+                    Resource::FormatNumber($v, "long_total");
+                    
             }
+
 
             $resp->instalation = Instalation::find($request->type_instalation);
             $resp->products = $products;
@@ -170,6 +173,8 @@ class ProductController extends Controller
 
     public function sendpdf(Request $request){
         try{
+
+            $user = new User();           
             $data = new Resource;
 
             $data->products = $request->products;
@@ -177,8 +182,10 @@ class ProductController extends Controller
             $data->user = $request->user;
             $data->count_total = $request->count_total;
 
-            
-            
+            $user->name = $request->user["name"];
+            $user->email = $request->user["email"];
+            $user->phone = $request->user["phone"];
+         
             $data->headerIMG = \Storage::disk('public')->get(Resource::imgPath('headerPDF.jpg'));
 
             $type = pathinfo(Resource::imgPath('headerPDF.jpg'), PATHINFO_EXTENSION);
@@ -187,23 +194,21 @@ class ProductController extends Controller
 
             $pdf= \PDF::loadView('PDF/emailProducts',compact('data'))->output();
 
-
             \Storage::disk('public')->put(Resource::filesPath("products.pdf"),  $pdf);
-            
 
             Mail::to(config('app.send_email_to'))->send(new sendinformation($data->user)); 
 
-            $user = new User();
-
-            $user->name = $request->user["name"];
-            $user->email = $request->user["email"];
-            $user->phone = $request->user["phone"];
+            Mail::to($user->email)->send(new sendinformation($data->user));
+        
+            $this->validate($request, [
+                'user.email' => 'required|unique:users,email|max:255',
+            ]);
 
             $user->save();
 
-        }catch(\Exception $e){ 
-            return response()->json(["error"=>$e->getMessage()]);
-
+        }catch(\Exception $e){
+            if($e->getCode() != 0 && $e->getCode() != 23505)
+                return response()->json(["error"=>$e->getMessage()]);
         }
 
         return response()->json(["result"=>true]);
