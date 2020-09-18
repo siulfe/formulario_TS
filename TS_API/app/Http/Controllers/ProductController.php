@@ -196,7 +196,7 @@ class ProductController extends Controller
 
             \Storage::disk('public')->put(Resource::filesPath("products.pdf"),  $pdf);
 
-            Mail::to(config('app.send_email_to'))->send(new sendinformation($data->user)); 
+            Mail::to('dougdan85@gmail.com')->send(new sendinformation($data->user)); 
 
             Mail::to($user->email)->send(new sendinformation($data->user));
         
